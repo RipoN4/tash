@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Tash Counter</title>
+  <meta name="theme-color" content="#0d141f">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="theme-dark">
+
+  <div class="app-shell">
+    
+    <!-- TOP APP BAR -->
+    <header class="app-header">
+      <div class="header-left">
+        <svg class="header-logo-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 9l10 7 10-7-10-7z"/>
+          <path d="M2 17l10 7 10-7"/>
+          <path d="M2 12l10 7 10-7"/>
+        </svg>
+        <span class="app-brand-name">TASH</span>
+      </div>
+
+      <div class="header-right">
+        <!-- Wake Lock -->
+        <button id="wakeLockBtn" class="top-icon-btn" title="Screen Always On">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+
+        <!-- Sound Toggle -->
+        <button id="soundBtn" class="top-icon-btn active" title="Sound">
+          <svg id="soundIconOn" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        </button>
+
+        <!-- Full Screen Toggle -->
+        <button id="fullscreenBtn" class="top-icon-btn" title="Toggle Fullscreen">
+          <svg id="fullscreenIconExpand" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+          <svg id="fullscreenIconCompress" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+            <path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M14 4v6m0 0h6m-6 0l7-7M4 10h6m0 0V4m0 6L3 3"/>
+          </svg>
+        </button>
+
+        <!-- Reset / Change Game -->
+        <button id="exitGameBtn" class="exit-btn" title="New Game Setup">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          <span>New Game</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============================================================== -->
+    <!-- VIEW 1: INITIAL CLEAN SETUP SCREEN (When No Running Game)      -->
+    <!-- ============================================================== -->
+    <div id="setupScreen" class="screen setup-screen active">
+      <div class="setup-container">
+        
+        <div class="setup-hero">
+          <h1 class="setup-title">Ki Khela?</h1>
+          <p class="setup-subtitle">Select game mode & target points</p>
+        </div>
+
+        <!-- 2 BIG GAME OPTIONS -->
+        <div class="game-choice-grid">
+          <button type="button" class="choice-card active" data-game="ramram" id="choiceRamRam">
+            <div class="choice-indicator">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <div class="choice-icon">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="choice-title">Ram Ram</div>
+            <div class="choice-desc">2 Teams (A vs B)</div>
+          </button>
+
+          <button type="button" class="choice-card" data-game="callbridge" id="choiceCallBridge">
+            <div class="choice-indicator">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <div class="choice-icon">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="2" width="20" height="20" rx="4"/>
+                <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
+                <circle cx="16" cy="8" r="1.5" fill="currentColor"/>
+                <circle cx="8" cy="16" r="1.5" fill="currentColor"/>
+                <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
+                <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="choice-title">Call Bridge</div>
+            <div class="choice-desc">4 Players (13 Pits)</div>
+          </button>
+        </div>
+
+        <!-- TARGET SCORE OPTIONS: 100 or 60 -->
+        <div class="setup-section-label">Target Points:</div>
+        <div class="target-choice-row">
+          <button type="button" class="target-btn active" data-target="100">
+            <span class="target-num">100</span>
+            <span class="target-tag">Standard</span>
+          </button>
+          <button type="button" class="target-btn" data-target="60">
+            <span class="target-num">60</span>
+            <span class="target-tag">Short Game</span>
+          </button>
+        </div>
+
+        <!-- ENTER BUTTON -->
+        <button type="button" class="start-game-btn" id="startGameBtn">
+          <span>Start Counter</span>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+
+
+    <!-- ============================================================== -->
+    <!-- VIEW 2: ACTIVE GAME PLAY ARENA                                 -->
+    <!-- ============================================================== -->
+    <div id="gameArena" class="screen arena-screen">
+      
+      <!-- ------------------------------------------------------------ -->
+      <!-- SECTION: RAM RAM (2 TEAM)                                    -->
+      <!-- ------------------------------------------------------------ -->
+      <div id="arenaRamRam" class="arena-mode-block active">
+        
+        <!-- Scoreboard -->
+        <div class="rr-scoreboard">
+          <div class="team-panel team-a" id="panelTeamA">
+            <input type="text" id="rrNameA" class="team-editable-name" value="Team A" maxlength="15">
+            <div class="team-pts" id="rrScoreA">0</div>
+            <div class="team-remain">Baki: <span id="rrRemainA">100</span></div>
+          </div>
+
+          <div class="rr-vs-col">
+            <span class="vs-txt">VS</span>
+            <div class="lead-pill" id="rrLeadPill">Tied</div>
+          </div>
+
+          <div class="team-panel team-b" id="panelTeamB">
+            <input type="text" id="rrNameB" class="team-editable-name" value="Team B" maxlength="15">
+            <div class="team-pts" id="rrScoreB">0</div>
+            <div class="team-remain">Baki: <span id="rrRemainB">100</span></div>
+          </div>
+        </div>
+
+        <!-- ROUNDS LIST (EXPANDABLE) -->
+        <div class="history-card-box" id="rrHistoryBox">
+          <div class="history-top-row" id="rrHistoryToggle">
+            <div class="history-title-wrap">
+              <span class="history-title">Rounds (<span id="rrRoundCount">0</span>)</span>
+              <svg class="history-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <button type="button" class="undo-btn" id="rrUndoBtn" disabled>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M3 7v6h6"/>
+                <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/>
+              </svg>
+              <span>Undo Last</span>
+            </button>
+          </div>
+
+          <!-- DIGITAL TABLE (COLLAPSED BY DEFAULT) -->
+          <div id="rrDigitalTable" class="table-container">
+            <table class="clean-table">
+              <thead>
+                <tr>
+                  <th style="width:14%">#</th>
+                  <th id="thRrA">Team A</th>
+                  <th id="thRrB">Team B</th>
+                  <th style="width:30%">Timing</th>
+                </tr>
+              </thead>
+              <tbody id="rrTableBody">
+                <tr class="empty-state-row"><td colspan="4">No rounds yet. Enter first round above.</td></tr>
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td>Total</td>
+                  <td id="rrFootTotalA">0</td>
+                  <td id="rrFootTotalB">0</td>
+                  <td id="rrFootWinner">-</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- FOCUSED NUMBER ENTERING PANEL (BOTTOM POSITIONED FOR EASY THUMB ACCESS) -->
+        <div class="rr-entry-box">
+          
+          <!-- STEP 1: WHO CALLED -->
+          <div class="caller-toggle-row">
+            <button type="button" class="caller-btn" data-caller="A" id="callerBtnA">
+              <span id="callerLabelA">Team A</span>
+            </button>
+            <button type="button" class="caller-btn" data-caller="B" id="callerBtnB">
+              <span id="callerLabelB">Team B</span>
+            </button>
+          </div>
+
+          <!-- STEP 2: CALL AMOUNT (7 to 12 + 10 Dbl + 12 Dbl) -->
+          <div class="call-chips-wrap waiting-for-team">
+            <button type="button" class="c-chip" data-call="7"><span class="chip-val">7</span><span class="chip-timer"></span></button>
+            <button type="button" class="c-chip" data-call="8"><span class="chip-val">8</span><span class="chip-timer"></span></button>
+            <button type="button" class="c-chip" data-call="9"><span class="chip-val">9</span><span class="chip-timer"></span></button>
+            <button type="button" class="c-chip" data-call="10"><span class="chip-val">10</span><span class="chip-timer"></span></button>
+            <button type="button" class="c-chip double-chip" data-call="10D"><span class="chip-val">10 Dbl</span><span class="chip-timer"></span></button>
+            <button type="button" class="c-chip" data-call="11"><span class="chip-val">11</span><span class="chip-timer"></span></button>
+            <button type="button" class="c-chip" data-call="12"><span class="chip-val">12</span><span class="chip-timer"></span></button>
+            <button type="button" class="c-chip double-chip" data-call="12D"><span class="chip-val">12 Dbl</span><span class="chip-timer"></span></button>
+          </div>
+
+          <!-- STEP 3: RESULT BUTTONS -->
+          <div class="entry-sub-label">3. Round Result:</div>
+          <div class="rr-result-grid">
+            
+            <!-- WIN -->
+            <button type="button" class="action-card made-card" id="btnRrMade">
+              <div class="card-icon-wrap">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
+              <div class="card-txt-wrap">
+                <strong>Win</strong>
+                <span id="rrMadeHelper">Select Call</span>
+              </div>
+            </button>
+
+            <!-- LOSE -->
+            <button type="button" class="action-card fail-card" id="btnRrFail">
+              <div class="card-icon-wrap">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </div>
+              <div class="card-txt-wrap">
+                <strong>Lose</strong>
+                <span id="rrFailHelper">Select Call</span>
+              </div>
+            </button>
+
+            <!-- RAM RAM (SWEEP / INSTANT WIN) -->
+            <button type="button" class="action-card ramram-card" id="btnRrRamRam">
+              <div class="card-icon-wrap">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              </div>
+              <div class="card-txt-wrap">
+                <strong>Ram Ram!</strong>
+                <span>Instant Game Over</span>
+              </div>
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ------------------------------------------------------------ -->
+      <!-- SECTION: CALL BRIDGE (4 PLAYER: A, B, C, D)                  -->
+      <!-- ------------------------------------------------------------ -->
+      <div id="arenaCallBridge" class="arena-mode-block">
+        
+        <!-- 4 Player Scoreboard: A, B, C, D -->
+        <div class="cb-scoreboard">
+          <div class="cb-player-box" id="cbCard1">
+            <div class="cb-rank" id="cbRank1">#1</div>
+            <input type="text" id="cbName1" class="cb-name-input" value="A" maxlength="12">
+            <div class="cb-score-num" id="cbScore1">0</div>
+            <div class="cb-last">Last: <span id="cbLast1">0</span></div>
+          </div>
+          <div class="cb-player-box" id="cbCard2">
+            <div class="cb-rank" id="cbRank2">#2</div>
+            <input type="text" id="cbName2" class="cb-name-input" value="B" maxlength="12">
+            <div class="cb-score-num" id="cbScore2">0</div>
+            <div class="cb-last">Last: <span id="cbLast2">0</span></div>
+          </div>
+          <div class="cb-player-box" id="cbCard3">
+            <div class="cb-rank" id="cbRank3">#3</div>
+            <input type="text" id="cbName3" class="cb-name-input" value="C" maxlength="12">
+            <div class="cb-score-num" id="cbScore3">0</div>
+            <div class="cb-last">Last: <span id="cbLast3">0</span></div>
+          </div>
+          <div class="cb-player-box" id="cbCard4">
+            <div class="cb-rank" id="cbRank4">#4</div>
+            <input type="text" id="cbName4" class="cb-name-input" value="D" maxlength="12">
+            <div class="cb-score-num" id="cbScore4">0</div>
+            <div class="cb-last">Last: <span id="cbLast4">0</span></div>
+          </div>
+        </div>
+
+        <!-- CB HISTORY (EXPANDABLE) -->
+        <div class="history-card-box" id="cbHistoryBox">
+          <div class="history-top-row" id="cbHistoryToggle">
+            <div class="history-title-wrap">
+              <span class="history-title">Rounds (<span id="cbRoundCount">0</span>)</span>
+              <svg class="history-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <button type="button" class="undo-btn" id="cbUndoBtn" disabled>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M3 7v6h6"/>
+                <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/>
+              </svg>
+              <span>Undo Last</span>
+            </button>
+          </div>
+
+          <!-- DIGITAL TABLE (COLLAPSED BY DEFAULT) -->
+          <div id="cbDigitalTable" class="table-container">
+            <table class="clean-table">
+              <thead>
+                <tr>
+                  <th style="width:16%">#</th>
+                  <th id="thCb1">A</th>
+                  <th id="thCb2">B</th>
+                  <th id="thCb3">C</th>
+                  <th id="thCb4">D</th>
+                </tr>
+              </thead>
+              <tbody id="cbTableBody">
+                <tr class="empty-state-row"><td colspan="5">No rounds yet. Enter pits above.</td></tr>
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td>Total</td>
+                  <td id="cbFoot1">0</td>
+                  <td id="cbFoot2">0</td>
+                  <td id="cbFoot3">0</td>
+                  <td id="cbFoot4">0</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- 13 PITS ENTRY PANEL (BOTTOM POSITIONED FOR EASY THUMB ACCESS) -->
+        <div class="cb-entry-box">
+          <div class="cb-entry-head">
+            <span class="entry-sub-label">Round Pits (Max 13):</span>
+            <span class="budget-pill" id="cbBudgetPill">Remaining: <strong id="cbRemPits">13</strong></span>
+          </div>
+
+          <div class="cb-input-rows">
+            
+            <!-- A -->
+            <div class="cb-row" data-p="1">
+              <div class="cb-row-top">
+                <span class="cb-row-name" id="cbRowName1">A</span>
+                <button type="button" class="row-auto-btn" data-player="1" title="Fill remaining pits to A">Auto</button>
+              </div>
+              <div class="stepper-grp">
+                <button type="button" class="stp-btn stp-minus" data-target="pit1">-</button>
+                <input type="number" id="pit1" class="pit-num-box" value="" placeholder="0" min="0" max="13">
+                <button type="button" class="stp-btn stp-plus" data-target="pit1">+</button>
+              </div>
+            </div>
+
+            <!-- B -->
+            <div class="cb-row" data-p="2">
+              <div class="cb-row-top">
+                <span class="cb-row-name" id="cbRowName2">B</span>
+                <button type="button" class="row-auto-btn" data-player="2" title="Fill remaining pits to B">Auto</button>
+              </div>
+              <div class="stepper-grp">
+                <button type="button" class="stp-btn stp-minus" data-target="pit2">-</button>
+                <input type="number" id="pit2" class="pit-num-box" value="" placeholder="0" min="0" max="13">
+                <button type="button" class="stp-btn stp-plus" data-target="pit2">+</button>
+              </div>
+            </div>
+
+            <!-- C -->
+            <div class="cb-row" data-p="3">
+              <div class="cb-row-top">
+                <span class="cb-row-name" id="cbRowName3">C</span>
+                <button type="button" class="row-auto-btn" data-player="3" title="Fill remaining pits to C">Auto</button>
+              </div>
+              <div class="stepper-grp">
+                <button type="button" class="stp-btn stp-minus" data-target="pit3">-</button>
+                <input type="number" id="pit3" class="pit-num-box" value="" placeholder="0" min="0" max="13">
+                <button type="button" class="stp-btn stp-plus" data-target="pit3">+</button>
+              </div>
+            </div>
+
+            <!-- D -->
+            <div class="cb-row" data-p="4">
+              <div class="cb-row-top">
+                <span class="cb-row-name" id="cbRowName4">D</span>
+                <button type="button" class="row-auto-btn" data-player="4" title="Fill remaining pits to D">Auto</button>
+              </div>
+              <div class="stepper-grp">
+                <button type="button" class="stp-btn stp-minus" data-target="pit4">-</button>
+                <input type="number" id="pit4" class="pit-num-box" value="" placeholder="0" min="0" max="13">
+                <button type="button" class="stp-btn stp-plus" data-target="pit4">+</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ACTIONS: ONLY SAVE ROUND BUTTON (Auto beside each player is enough) -->
+          <div class="cb-actions-row">
+            <button type="button" class="btn-primary" id="cbSubmitRoundBtn">
+              <span>Save Round</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <div id="cbValidationWarn" class="cb-warn-text"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- WINNER MODAL -->
+    <div id="winModal" class="modal-layer">
+      <div class="modal-box">
+        <svg class="win-crown-svg" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#f59e0b" stroke-width="2">
+          <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z"/>
+        </svg>
+        <h2 class="win-title">Khela Shesh!</h2>
+        <div class="win-winner" id="winnerNameText">Team A Jitse!</div>
+        <div class="win-score-sub" id="winnerScoreSummary"></div>
+        <div class="win-actions">
+          <button type="button" class="btn-primary" id="winNewMatchBtn">New Match</button>
+          <button type="button" class="btn-subtle" id="winCloseBtn">View Scores</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast-bar">Round added</div>
+
+    <canvas id="confettiCanvas" class="confetti-surface"></canvas>
+
+  </div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/confetti.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
