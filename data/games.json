@@ -1,28 +1,16 @@
 {
     "active": true,
-    "mode": "ramram",
+    "mode": "callbridge",
     "target": 100,
     "view": "digital",
     "soundEnabled": true,
     "wakeLockActive": false,
-    "wakeLockSentinel": null,
     "ramram": {
         "teamA": "Team A",
         "teamB": "Team B",
         "caller": null,
         "call": null,
-        "rounds": [
-            {
-                "id": 1791084198557,
-                "timestamp": 1791084198557,
-                "caller": "B",
-                "call": "10D",
-                "outcome": "made",
-                "ptsA": 0,
-                "ptsB": 20,
-                "note": "Team B Call 10D Won (+20)"
-            }
-        ],
+        "rounds": [],
         "isGameOver": false,
         "winner": null
     },
@@ -37,5 +25,5 @@
         "isGameOver": false,
         "winnerIdx": null
     },
-    "server_saved_at": "2026-10-04 05:23:18"
+    "server_saved_at": "2026-10-04 06:51:43"
 }

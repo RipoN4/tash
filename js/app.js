@@ -127,7 +127,8 @@ const LockManager = {
   updateUI() {
     const callerRow = document.querySelector('.caller-toggle-row');
     const chipsWrap = document.querySelector('.call-chips-wrap');
-    const activeChip = document.querySelector('.c-chip.active');
+    const activeChip = document.querySelector('.c-chip.active:not(.dbl-toggle-chip)');
+    const dblBtn = document.getElementById('btnDblToggle');
 
     // Strict workflow cue: if no team selected, chips are waiting for team
     if (chipsWrap) {
@@ -135,7 +136,7 @@ const LockManager = {
     }
 
     // Reset timer badges on all chips
-    document.querySelectorAll('.c-chip .chip-timer').forEach(t => {
+    document.querySelectorAll('.c-chip:not(.dbl-toggle-chip) .chip-timer').forEach(t => {
       t.textContent = '';
       t.style.display = 'none';
     });
@@ -145,7 +146,8 @@ const LockManager = {
     if (!hasBoth || !activeChip) {
       if (callerRow) callerRow.classList.remove('locked');
       if (chipsWrap) chipsWrap.classList.remove('locked', 'counting-down');
-      document.querySelectorAll('.c-chip').forEach(c => c.classList.remove('counting-down', 'locked'));
+      document.querySelectorAll('.c-chip:not(.dbl-toggle-chip)').forEach(c => c.classList.remove('counting-down', 'locked'));
+      if (dblBtn) dblBtn.classList.remove('locked');
       updateRrActionLabels();
       return;
     }
@@ -160,6 +162,7 @@ const LockManager = {
       }
       activeChip.classList.remove('counting-down');
       activeChip.classList.add('locked');
+      if (dblBtn) dblBtn.classList.add('locked');
       if (timerSpan) {
         timerSpan.textContent = '🔒';
         timerSpan.style.display = 'inline-block';
@@ -172,6 +175,7 @@ const LockManager = {
       }
       activeChip.classList.remove('locked');
       activeChip.classList.add('counting-down');
+      if (dblBtn) dblBtn.classList.remove('locked');
       if (timerSpan) {
         timerSpan.textContent = `${this.secondsLeft}s`;
         timerSpan.style.display = 'inline-block';
@@ -327,8 +331,8 @@ function bindEvents() {
     updateRrActionLabels();
   });
 
-  // Call Chips (7 to 12, 10D, 12D)
-  document.querySelectorAll('.c-chip').forEach(chip => {
+  // Call Chips (7 to 12)
+  document.querySelectorAll('.c-chip:not(.dbl-toggle-chip)').forEach(chip => {
     chip.addEventListener('click', () => {
       // STRICT WORKFLOW: Must select Team first before Call Number!
       if (!GameState.ramram.caller) {
@@ -355,15 +359,106 @@ function bindEvents() {
       }
 
       window.soundEngine.playTap();
-      GameState.ramram.call = chip.dataset.call;
-      document.querySelectorAll('.c-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
+      const baseCall = chip.dataset.call;
+      const num = parseInt(baseCall, 10);
+      const isDoubleable = num === 10 || num === 11 || num === 12;
 
-      // Team is already selected -> Start 15s Fair Play Lock countdown
+      // Keep double if double button was active and new number is doubleable
+      const dblBtn = document.getElementById('btnDblToggle');
+      const wasDouble = isDoubleable && dblBtn && dblBtn.classList.contains('active');
+
+      GameState.ramram.call = wasDouble ? `${baseCall}D` : baseCall;
+
+      // Reset all number chips
+      document.querySelectorAll('.c-chip:not(.dbl-toggle-chip)').forEach(c => {
+        c.classList.remove('active');
+        const val = c.querySelector('.chip-val');
+        if (val) val.textContent = c.dataset.call;
+      });
+
+      chip.classList.add('active');
+      if (wasDouble) {
+        const val = chip.querySelector('.chip-val');
+        if (val) val.textContent = `${baseCall} Dbl`;
+      }
+
+      // Update double button enabled/disabled state
+      if (dblBtn) {
+        dblBtn.classList.toggle('disabled', !isDoubleable);
+        dblBtn.classList.toggle('active', wasDouble);
+      }
+
+      // Start 15s Fair Play Lock countdown
       LockManager.start();
       updateRrActionLabels();
     });
   });
+
+  // 2x Double Toggle Button (10, 11, 12 only)
+  const dblToggleBtn = document.getElementById('btnDblToggle');
+  if (dblToggleBtn) {
+    dblToggleBtn.addEventListener('click', () => {
+      if (!GameState.ramram.caller) {
+        showToast("Please select Team first!");
+        window.soundEngine.playSad();
+        const callerRow = document.querySelector('.caller-toggle-row');
+        if (callerRow) {
+          callerRow.classList.add('shake-cue');
+          setTimeout(() => callerRow.classList.remove('shake-cue'), 600);
+        }
+        return;
+      }
+
+      if (LockManager.isLocked) {
+        if (confirm("Call is locked for fair play. Do you want to unlock to change call or team?")) {
+          LockManager.start();
+          showToast("Call unlocked for 15s");
+        } else {
+          return;
+        }
+      }
+
+      const currentCall = GameState.ramram.call;
+      if (!currentCall) {
+        showToast("Select 10, 11, or 12 first!");
+        window.soundEngine.playSad();
+        return;
+      }
+
+      const baseNum = parseInt(currentCall, 10);
+      if (baseNum !== 10 && baseNum !== 11 && baseNum !== 12) {
+        showToast("Double only allowed for 10, 11, 12!");
+        window.soundEngine.playSad();
+        return;
+      }
+
+      window.soundEngine.playTap();
+      const activeChip = document.querySelector(`.c-chip[data-call="${baseNum}"]`);
+
+      if (currentCall.endsWith('D')) {
+        // Toggle OFF
+        GameState.ramram.call = `${baseNum}`;
+        dblToggleBtn.classList.remove('active');
+        if (activeChip) {
+          const val = activeChip.querySelector('.chip-val');
+          if (val) val.textContent = `${baseNum}`;
+        }
+        showToast(`Call: ${baseNum} Single`);
+      } else {
+        // Toggle ON
+        GameState.ramram.call = `${baseNum}D`;
+        dblToggleBtn.classList.add('active');
+        if (activeChip) {
+          const val = activeChip.querySelector('.chip-val');
+          if (val) val.textContent = `${baseNum} Dbl`;
+        }
+        showToast(`Call: ${baseNum} Double (2x)!`);
+      }
+
+      LockManager.start();
+      updateRrActionLabels();
+    });
+  }
 
   // Outcome Buttons: Win, Lose, Ram Ram
   document.getElementById('btnRrMade').addEventListener('click', () => handleRrOutcome('made'));
@@ -493,14 +588,24 @@ function clearCallerButtons() {
 }
 
 function clearCallChips() {
-  document.querySelectorAll('.c-chip').forEach(c => {
+  document.querySelectorAll('.c-chip:not(.dbl-toggle-chip)').forEach(c => {
     c.classList.remove('active', 'counting-down', 'locked');
     const timer = c.querySelector('.chip-timer');
     if (timer) {
       timer.textContent = '';
       timer.style.display = 'none';
     }
+    const val = c.querySelector('.chip-val');
+    if (val && c.dataset.call) {
+      val.textContent = c.dataset.call;
+    }
   });
+
+  const dblBtn = document.getElementById('btnDblToggle');
+  if (dblBtn) {
+    dblBtn.classList.remove('active', 'locked');
+    dblBtn.classList.add('disabled');
+  }
 }
 
 // ==========================================================================
@@ -568,14 +673,10 @@ function updateRrActionLabels() {
   let madePts = 0;
   let failPts = 0;
 
-  if (call === '10D') {
-    // 10 Double rule: Made = 20, Fail = 40 to opposite team
-    madePts = 20;
-    failPts = 40;
-  } else if (call === '12D') {
-    // 12 Double rule: Made = 24, Fail = 48 to opposite team
-    madePts = 24;
-    failPts = 48;
+  if (call.endsWith('D')) {
+    const base = parseInt(call, 10);
+    madePts = base * 2;
+    failPts = base * 4;
   } else {
     const num = parseInt(call, 10);
     madePts = num;
@@ -622,27 +723,33 @@ function handleRrOutcome(outcome) {
     window.soundEngine.playJoy();
 
     let pts = 0;
-    if (call === '10D') pts = 20;
-    else if (call === '12D') pts = 24;
-    else pts = parseInt(call, 10);
+    if (call.endsWith('D')) {
+      pts = parseInt(call, 10) * 2;
+    } else {
+      pts = parseInt(call, 10);
+    }
 
     if (caller === 'A') ptsA = pts;
     else ptsB = pts;
 
-    note = `${callerName} Call ${call} Won (+${pts})`;
+    const displayCall = call.endsWith('D') ? `${call.slice(0, -1)} Dbl` : call;
+    note = `${callerName} Call ${displayCall} Won (+${pts})`;
   } else if (outcome === 'fail') {
     // PLAY SAD SOUND FOR LOSE BUTTON
     window.soundEngine.playSad();
 
     let pts = 0;
-    if (call === '10D') pts = 40; // 10 Double fail -> 40 points to opponent!
-    else if (call === '12D') pts = 48; // 12 Double fail -> 48 points to opponent!
-    else pts = parseInt(call, 10) * 2; // standard double
+    if (call.endsWith('D')) {
+      pts = parseInt(call, 10) * 4;
+    } else {
+      pts = parseInt(call, 10) * 2;
+    }
 
     if (opp === 'A') ptsA = pts;
     else ptsB = pts;
 
-    note = `${callerName} Call ${call} Lost -> ${oppName} +${pts}`;
+    const displayCall = call.endsWith('D') ? `${call.slice(0, -1)} Dbl` : call;
+    note = `${callerName} Call ${displayCall} Lost -> ${oppName} +${pts}`;
   } else if (outcome === 'ramram') {
     // RAM RAM = INSTANT GAME OVER & WIN FOR CALLING TEAM!
     window.soundEngine.playRamRam();
@@ -799,10 +906,28 @@ function renderRamRam() {
   document.getElementById('callerBtnA').classList.toggle('active', rState.caller === 'A');
   document.getElementById('callerBtnB').classList.toggle('active', rState.caller === 'B');
 
-  // Sync call chips active state (no chip active if call is null)
-  document.querySelectorAll('.c-chip').forEach(c => {
-    c.classList.toggle('active', !!rState.call && c.dataset.call === rState.call);
+  // Sync call chips and double toggle state
+  const call = rState.call;
+  const isDbl = !!call && call.endsWith('D');
+  const baseCall = isDbl ? call.slice(0, -1) : call;
+
+  document.querySelectorAll('.c-chip:not(.dbl-toggle-chip)').forEach(c => {
+    const isThisActive = !!baseCall && c.dataset.call === baseCall;
+    c.classList.toggle('active', isThisActive);
+    const valSpan = c.querySelector('.chip-val');
+    if (valSpan && c.dataset.call) {
+      valSpan.textContent = (isThisActive && isDbl) ? `${c.dataset.call} Dbl` : c.dataset.call;
+    }
   });
+
+  const dblBtn = document.getElementById('btnDblToggle');
+  if (dblBtn) {
+    const baseNum = parseInt(baseCall, 10);
+    const isDoubleable = baseNum === 10 || baseNum === 11 || baseNum === 12;
+    dblBtn.classList.toggle('disabled', !isDoubleable);
+    dblBtn.classList.toggle('active', isDbl);
+    dblBtn.classList.toggle('locked', LockManager.isLocked && isDbl);
+  }
 
   updateRrActionLabels();
   LockManager.updateUI();

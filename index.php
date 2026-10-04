@@ -175,15 +175,15 @@ header('Content-Type: text/html; charset=UTF-8');
             <div class="team-remain">Baki: <span id="rrRemainA">100</span></div>
           </div>
 
-          <div class="rr-vs-col">
-            <span class="vs-txt">VS</span>
-            <div class="lead-pill" id="rrLeadPill">Tied</div>
-          </div>
-
           <div class="team-panel team-b" id="panelTeamB">
             <input type="text" id="rrNameB" class="team-editable-name" value="Team B" maxlength="15">
             <div class="team-pts" id="rrScoreB">0</div>
             <div class="team-remain">Baki: <span id="rrRemainB">100</span></div>
+          </div>
+
+          <div class="rr-vs-col">
+            <span class="vs-txt">VS</span>
+            <div class="lead-pill" id="rrLeadPill">Tied</div>
           </div>
         </div>
 
@@ -245,16 +245,17 @@ header('Content-Type: text/html; charset=UTF-8');
             </button>
           </div>
 
-          <!-- STEP 2: CALL AMOUNT (7 to 12 + 10 Dbl + 12 Dbl) -->
+          <!-- STEP 2: CALL AMOUNT (7 to 12 + 2x Double Toggle) -->
           <div class="call-chips-wrap waiting-for-team">
             <button type="button" class="c-chip" data-call="7"><span class="chip-val">7</span><span class="chip-timer"></span></button>
             <button type="button" class="c-chip" data-call="8"><span class="chip-val">8</span><span class="chip-timer"></span></button>
             <button type="button" class="c-chip" data-call="9"><span class="chip-val">9</span><span class="chip-timer"></span></button>
             <button type="button" class="c-chip" data-call="10"><span class="chip-val">10</span><span class="chip-timer"></span></button>
-            <button type="button" class="c-chip double-chip" data-call="10D"><span class="chip-val">10 Dbl</span><span class="chip-timer"></span></button>
             <button type="button" class="c-chip" data-call="11"><span class="chip-val">11</span><span class="chip-timer"></span></button>
             <button type="button" class="c-chip" data-call="12"><span class="chip-val">12</span><span class="chip-timer"></span></button>
-            <button type="button" class="c-chip double-chip" data-call="12D"><span class="chip-val">12 Dbl</span><span class="chip-timer"></span></button>
+            <button type="button" class="c-chip dbl-toggle-chip disabled" id="btnDblToggle">
+              <span class="chip-val">2x Double</span>
+            </button>
           </div>
 
           <!-- STEP 3: RESULT BUTTONS -->
